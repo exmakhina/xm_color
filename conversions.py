@@ -42,6 +42,39 @@ def ycbcr_bt601_fs_to_rgb(yuv):
 
 
 
+
+"""
+sRGB stuff.
+
+https://en.wikipedia.org/wiki/SRGB
+sRGB is an RGB color space that uses the ITU-R BT.709 primaries,
+
+"""
+
+def srgb_gamma(rgb):
+	"""
+	Convert from linear RGB to sRGB
+	"""
+	srgb = np.zeros_like(rgb)
+	t0 = 0.0031308
+	alpha = 0.055
+	srgb[rgb<=t0] = 12.92 * rgb[rgb<=t0]
+	srgb[rgb>t0] = (1+alpha)*(rgb[rgb>t0]**(1/2.4)) - alpha
+	return srgb
+
+
+def srgb_invgamma(srgb):
+	"""
+	Convert from sRGB to linear RGB
+	"""
+	rgb = np.zeros_like(srgb)
+	t0 = 0.04045
+	alpha = 0.055
+	rgb[srgb<=t0] = 1/12.92 * srgb[srgb<=t0]
+	rgb[srgb>t0] = ((srgb[srgb>t0]+alpha)/(1+alpha))**2.4
+	return rgb
+
+
 def xyz2lab(xyz, xn=100.0/95.047, yn=100.0/100.0, zn=100.0/108.883):
 	"""
 	Convert an image in XYZ color space to L*a*b* color space.
