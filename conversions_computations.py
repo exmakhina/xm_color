@@ -94,8 +94,51 @@ def do_yuv():
 	- W_G = 0.6780
 	- W_B = 0.0593
 
-
 	"""
+
+
+def do_lab():
+	"""
+	https://en.wikipedia.org/wiki/Lab_color_space#CIELAB-CIEXYZ_conversions
+
+	The division of the domain of the :math:`f` function into two parts
+	was done to prevent an infinite slope at :math:`t = 0`.
+	The function f was assumed to be linear below some :math:`t = t_0`,
+	and was assumed to match the :math:`t^{1/3}` part of the function
+	at :math:`t_0` in both value and slope.
+	And we have L = 0 for Y = 0.
+	"""
+
+	t_0, m, c \
+	 = sympy.symbols("t_0, m, c")
+
+	linear_part = m*t_0 + c
+	other_part = t_0**sympy.Rational("1/3")
+
+	# equality in value at t_0
+	e1 = sympy.Eq(other_part, linear_part)
+	print(sympy.pretty(e1))
+
+	# equality in slope
+	e2 = sympy.Eq(sympy.diff(e1.lhs, t_0), sympy.diff(e1.rhs, t_0))
+	print(sympy.pretty(e2))
+	# (if we want to make it solvable without introducing delta)
+	#e2 = sympy.Eq(e2.lhs**sympy.Rational("3/2"), e2.rhs**sympy.Rational("3/2"))
+
+	# L=0 at Y=0
+	e3 = sympy.Eq(116 * c - 16)
+	print(sympy.pretty(e3))
+
+	delta = sympy.Symbol("delta")
+	e4 = sympy.Eq(t_0, delta**3)
+
+	x = sympy.solve([e1, e2, e3, e4])
+	assert len(x) == 1
+	s = x[0]
+	print(s)
 
 if __name__ == "__main__":
 	do_yuv()
+	do_lab()
+
+
