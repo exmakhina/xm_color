@@ -6,7 +6,7 @@ import sympy
 
 def do_yuv():
 	"""
-	Perform YUV <-> RGB computations.
+	Color analog TV: perform YUV <-> RGB computations.
 
 	The luma and chroma components in YUV are calculated from gamma corrected RGB.
 
@@ -90,13 +90,10 @@ def do_yuv():
 	"""
 
 
-
-
 	"""
 	https://en.wikipedia.org/wiki/Rec._2020
 
 	- W_R = 0.2627
-	- W_G = 0.6780
 	- W_B = 0.0593
 
 	"""
@@ -140,43 +137,47 @@ def do_ycbcr():
 	e7 = sympy.Eq(V, V_max * (R - Y) / (1 - W_R))
 	e8 = sympy.Eq(Y, R * W_R + G * W_G + B * W_B)
 
-	x = sympy.solve([e1, e2, e3], [W_R, W_B, W_G])
-	print(x)
-	for name in ("W_R", "W_G", "W_B"):
-		for k, v in x.items():
-			if k.name == name:
-				print("%s = %s" % (k, v))
+	def process():
+		x = sympy.solve([e1, e2, e3], [W_R, W_B, W_G])
+		print(x)
+		for name in ("W_R", "W_G", "W_B"):
+			for k, v in x.items():
+				if k.name == name:
+					print("%s = %s" % (k, v))
 
-	"""
-	RGB2YUV
-	"""
+		"""
+		RGB2YUV
+		"""
 
-	x = sympy.solve(
-	 [e1, e2, e3, e4, e5, e6, e7, e8],
-	 exclude=[R,G,B])
-	assert len(x) == 1
-	print(x)
-	s = x[0]
-	for name in ("Y", "U", "V"):
-		for k, v in x[0].items():
-			if k.name == name:
-				print("%s = %s" % (k, v))
+		x = sympy.solve(
+		 [e1, e2, e3, e4, e5, e6, e7, e8],
+		 exclude=[R,G,B])
+		assert len(x) == 1
+		print(x)
+		s = x[0]
+		for name in ("Y", "U", "V"):
+			for k, v in x[0].items():
+				if k.name == name:
+					print("%s = %s" % (k, v))
 
-	"""
-	YUV2RGB
-	"""
+		"""
+		YUV2RGB
+		"""
 
-	x = sympy.solve(
-	 [e1, e2, e3, e4, e5, e6, e7, e8],
-	 exclude=[Y,U,V])
-	assert len(x) == 1
-	print(x)
-	s = x[0]
-	for name in ("R", "G", "B"):
-		for k, v in x[0].items():
-			if k.name == name:
-				print("%s = %s" % (k, v))
+		x = sympy.solve(
+		 [e1, e2, e3, e4, e5, e6, e7, e8],
+		 exclude=[Y,U,V])
+		assert len(x) == 1
+		print(x)
+		s = x[0]
+		for name in ("R", "G", "B"):
+			for k, v in x[0].items():
+				if k.name == name:
+					print("%s = %s" % (k, v))
 
+
+	print("BT.601")
+	process()
 
 
 	"""
@@ -187,19 +188,27 @@ def do_ycbcr():
 
 	"""
 
+	e1 = sympy.Eq(W_R, 0.2126)
+	e2 = sympy.Eq(W_B, 0.0722)
 
+	print("BT.709")
+	process()
 
 
 	"""
 	https://en.wikipedia.org/wiki/Rec._2020
 
 	- W_R = 0.2627
-	- W_G = 0.6780
 	- W_B = 0.0593
 
 	"""
 
-		
+	e1 = sympy.Eq(W_R, 0.2627)
+	e2 = sympy.Eq(W_B, 0.0593)
+
+	print("Rec.2020")
+	process()
+
 
 def do_lab():
 	"""

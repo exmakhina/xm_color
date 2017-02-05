@@ -14,7 +14,67 @@ be unusable in numerical optimization code.
 import numpy as np
 
 
+
+
 """
+Conversion between RGB and YCbCr with BT.601
+"""
+
+def rgb_to_ycbcr_bt601_fs(rgb):
+	R, G, B = rgb[...,0], rgb[...,1], rgb[...,2]
+	yuv = np.zeros_like(rgb)
+	Y = 0.114*B + 0.587*G + 0.299*R
+	U = 0.5*B - 0.331264108352144*G - 0.168735891647856*R
+	V = -0.0813124108416548*B - 0.418687589158345*G + 0.5*R
+	yuv[...,0] = Y
+	yuv[...,1] = U
+	yuv[...,2] = V
+	return yuv
+
+def ycbcr_bt601_fs_to_rgb(yuv):
+	Y, U, V = yuv[...,0], yuv[...,1], yuv[...,2]
+	rgb = np.zeros_like(yuv)
+	R = 1.402*V + Y
+	G = -0.344136286201022*U - 0.714136286201022*V + Y
+	B = 1.772*U + Y
+	rgb[...,0] = R
+	rgb[...,1] = G
+	rgb[...,2] = B
+	return rgb
+
+
+
+"""
+Conversion between RGB and YCbCr with BT.709
+"""
+
+def rgb_to_ycbcr_bt709_fs(rgb):
+	R, G, B = rgb[...,0], rgb[...,1], rgb[...,2]
+	yuv = np.zeros_like(rgb)
+	Y = 0.0722*B + 0.7152*G + 0.2126*R
+	U = 0.5*B - 0.38542789394266*G - 0.11457210605734*R
+	V = -0.0458470916941834*B - 0.454152908305817*G + 0.5*R
+	yuv[...,0] = Y
+	yuv[...,1] = U
+	yuv[...,2] = V
+	return yuv
+
+def ycbcr_bt601_fs_to_rgb(yuv):
+	Y, U, V = yuv[...,0], yuv[...,1], yuv[...,2]
+	rgb = np.zeros_like(yuv)
+	R = 1.5748*V + Y
+	G = -0.187324272930649*U - 0.468124272930649*V + Y
+	B = 1.8556*U + Y
+	rgb[...,0] = R
+	rgb[...,1] = G
+	rgb[...,2] = B
+	return rgb
+
+
+
+"""
+Conversion between RGB and YUV with BT.601
+
 Coefficients computed from conversions_computations.py
 """
 
