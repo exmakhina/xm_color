@@ -130,6 +130,25 @@ def yuv_bt601_fs_to_rgb(yuv):
 
 
 
+def ccm_3x4(rgb, xr, xg, xb, ox, yr, yg, yb, oy, zr, zg, zb, oz):
+	"""
+	"""
+	xyz = np.zeros_like(rgb)
+	xyz[:,:,0] = xr * rgb[:,:,0] + \
+				 xg * rgb[:,:,1] + \
+				 xb * rgb[:,:,2] + \
+				 ox
+	xyz[:,:,1] = yr * rgb[:,:,0] + \
+				 yg * rgb[:,:,1] + \
+				 yb * rgb[:,:,2] + \
+				 oy
+	xyz[:,:,2] = zr * rgb[:,:,0] + \
+				 zg * rgb[:,:,1] + \
+				 zb * rgb[:,:,2] + \
+				 oz
+	return xyz
+
+
 
 """
 sRGB stuff.
