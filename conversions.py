@@ -72,6 +72,34 @@ def ycbcr_bt601_fs_to_rgb(yuv):
 
 
 
+
+def r709_gamma(rgb):
+	"""
+	Convert from linear RGB to R.709 gamma RGB
+	:param rgb: array with values in [0,1]
+	"""
+	srgb = np.zeros_like(rgb)
+	t0 = 0.0018
+	alpha = 0.099
+	srgb[rgb<=t0] = 4.5 * rgb[rgb<=t0]
+	srgb[rgb>t0] = (1+alpha)*(rgb[rgb>t0]**(0.45)) - alpha
+	return srgb
+
+
+def r709_invgamma(srgb):
+	"""
+	Convert from R.709 gamma RGB to linear RGB
+	:param srgb: array with values in [0,1]
+	"""
+	rgb = np.zeros_like(srgb)
+	t0 = 0.081
+	alpha = 0.055
+	rgb[srgb<=t0] = 1/4.5 * srgb[srgb<=t0]
+	rgb[srgb>t0] = ((srgb[srgb>t0]+alpha)/(1+alpha))**(1/0.45)
+	return rgb
+
+
+
 """
 Conversion between RGB and YUV with BT.601
 
