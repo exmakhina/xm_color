@@ -182,6 +182,13 @@ def srgb_invgamma(srgb):
 	return rgb
 
 
+
+
+
+"""
+CIE LAB stuff
+"""
+
 def xyz2lab(xyz, xn=100.0/95.047, yn=100.0/100.0, zn=100.0/108.883):
 	"""
 	Convert an image in XYZ color space to L*a*b* color space.
@@ -198,7 +205,7 @@ def xyz2lab(xyz, xn=100.0/95.047, yn=100.0/100.0, zn=100.0/108.883):
 	"""
 	assert xyz.dtype in (np.float32, np.float64), xyz.dtype
 	lab = np.zeros_like(xyz)
-	x, y, z = cv2.split(xyz)
+	x, y, z = xyz[...,0], xyz[...,1], xyz[...,2]
 
 	delta = 6.0/29.0
 	delta2 = (6.0**2)/(29**2)
@@ -222,4 +229,6 @@ def xyz2lab(xyz, xn=100.0/95.047, yn=100.0/100.0, zn=100.0/108.883):
 	a = 500 * (fx - fy)
 	b = 200 * (fy - fz)
 
-	return cv2.merge((l, a, b))
+	lab[...,0] = l
+	lab[...,1] = a
+	lab[...,2] = b
