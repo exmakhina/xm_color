@@ -20,6 +20,7 @@ def CIE_deltaE_2000(lab1, lab2, kl=1.0, kc=1.0, kh=1.0):
 	- https://en.wikipedia.org/wiki/Color_difference#CIEDE2000
 	- http://www.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf
 	"""
+
 	L1, a1, b1 = cv2.split(lab1)
 	L2, a2, b2 = cv2.split(lab2)
 	c1 = np.sqrt(a1**2+b1**2)
