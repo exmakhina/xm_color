@@ -232,3 +232,14 @@ def xyz2lab(xyz, xn=100.0/95.047, yn=100.0/100.0, zn=100.0/108.883):
 	lab[...,0] = l
 	lab[...,1] = a
 	lab[...,2] = b
+
+def cv2_rgbswap(img):
+	"""
+	OpenCV uses RGB24 ordered in BGR, not RGB.
+	"""
+	res = np.empty_like(img)
+	res[...,0] = img[...,2]
+	res[...,1] = img[...,1]
+	res[...,2] = img[...,0]
+	return res
+
