@@ -59,7 +59,7 @@ def rgb_to_ycbcr_bt709_fs(rgb):
 	yuv[...,2] = V
 	return yuv
 
-def ycbcr_bt601_fs_to_rgb(yuv):
+def ycbcr_bt709_fs_to_rgb(yuv):
 	Y, U, V = yuv[...,0], yuv[...,1], yuv[...,2]
 	rgb = np.zeros_like(yuv)
 	R = 1.5748*V + Y
