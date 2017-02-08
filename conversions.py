@@ -243,3 +243,64 @@ def cv2_rgbswap(img):
 	res[...,2] = img[...,0]
 	return res
 
+
+
+def layout_420p_to_444(img):
+	"""
+	Convert from 4:2:0 planar to 4:4:4 interleaved.
+	"""
+	if len(img.shape) != 2:
+		raise ValueError("Image should be 2D")
+	h_32, w = img.shape
+
+	if h_32 % 3 != 0:
+		raise ValueError("Image shape is not multiple of 3")
+
+	h = h_32 * 2 // 3
+
+	out = np.empty((h, w, 3), dtype=img.dtype)
+
+	out[...,0] = img[:h]
+
+	u = img[h:h*5//4].reshape(h//2, w//2)
+	v = img[h*5//4:].reshape(h//2, w//2)
+
+	import cv2
+
+	out[...,1] = cv2.resize(u, (w, h))
+	out[...,2] = cv2.resize(v, (w, h))
+	return out
+
+
+def layout_444_to_420p(img_444):
+	"""
+	Convert from 4:4:4 interleaved to 4:2:0 planar
+	"""
+
+	import cv2
+
+	if len(img_444.shape) != 3:
+		raise ValueError("Image must be 3D")
+
+	if img_444.shape[2] != 3:
+		raise ValueError("Image must have 3 components")
+
+	h, w = img_444.shape[:2]
+
+	y = img_444[...,0]
+	u = img_444[...,1]
+	v = img_444[...,2]
+
+	u = cv2.resize(u, (w//2, h//2), interpolation=cv2.INTER_AREA)
+	v = cv2.resize(v, (w//2, h//2), interpolation=cv2.INTER_AREA)
+
+	u = u.reshape((h//4, w))
+	v = v.reshape((h//4, w))
+
+	out = np.empty((h*3//2, w))
+
+	out[:h] = y
+	out[h:h*5//4] = u
+	out[h*5//4:] = v
+
+	return out
