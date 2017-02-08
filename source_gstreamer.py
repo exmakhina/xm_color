@@ -33,6 +33,9 @@ class SourceGstreamer(object):
 		)
 		self._bufsize = self._like.size * self._like.itemsize
 
+	def __del__(self):
+		self._proc.kill()
+
 	def read(self):
 		data = os.read(self._pipe[0], self._bufsize)
 		return np.fromstring(data, dtype=self._like.dtype).reshape(self._like.shape)
