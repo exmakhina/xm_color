@@ -10,6 +10,7 @@ be unusable in numerical optimization code.
 
 """
 
+import warnings
 
 import numpy as np
 
@@ -98,6 +99,60 @@ def r709_invgamma(srgb):
 	rgb[srgb>t0] = ((srgb[srgb>t0]+alpha)/(1+alpha))**(1/0.45)
 	return rgb
 
+
+def yuv_16_235_240_to_yuv_0_255(yuv, error=False):
+	"""
+	Convert from studio swing to full swing
+	:param yuv: buffer having Y normally in [16-235] and U&V in [16, 240]
+	:return: buffer like yuv, but full swing
+	"""
+	if yuv.dtype in (np.uint8,):
+		y = yuv[..., 0].copy()
+		u = yuv[..., 1].copy()
+		v = yuv[..., 2].copy()
+
+		y_min, y_max = 16, 235
+		y_lo, y_hi = np.min(y), np.max(y)
+		if y_lo < y_min or y_hi > y_max:
+			if error:
+				raise ValueError("Y goes out of range [%d,%d]" % (y_lo, y_hi))
+			else:
+				warnings.warn("Y goes out of range [%d,%d]" % (y_lo, y_hi), RuntimeWarning)
+				y[y<y_min] = y_min
+				y[y>y_max] = y_max
+
+		u_min, u_max = 16, 240
+		u_lo, u_hi = np.min(u), np.max(u)
+		if u_lo < u_min or u_hi > u_max:
+			if error:
+				raise ValueError("U goes out of range [%d,%d]" % (u_lo, u_hi))
+			else:
+				warnings.warn("U goes out of range [%d,%d]" % (u_lo, u_hi), RuntimeWarning)
+				u[u<u_min] = u_min
+				u[u>u_max] = u_max
+
+		v_min, v_max = 16, 240
+		v_lo, v_hi = np.min(v), np.max(v)
+		if v_lo < v_min or v_hi > v_max:
+			if error:
+				raise ValueError("V goes out of range [%d,%d]" % (v_lo, v_hi))
+			else:
+				warnings.warn("V goes out of range [%d,%d]" % (v_lo, v_hi), RuntimeWarning)
+				v[v<v_min] = v_min
+				v[v>v_max] = v_max
+
+		out = np.empty_like(yuv)
+		out[...,0] = np.uint8(np.uint16(y - 16) * 255 / (y_max-y_min))
+		out[...,1] = 128 + (np.int16(u - 128) * 255 / (u_max-u_min))
+		out[...,2] = 128 + (np.int16(v - 128) * 255 / (v_max-v_min))
+		return out
+
+	elif yuv.dtype in (np.float32, np.float64):
+		raise NotImplementedError()
+		#out = np.empty_like(yuv)
+		#out[...,0] =
+	else:
+		raise NotImplementedError()
 
 
 """
