@@ -299,6 +299,18 @@ def do_gamma():
 		v = v.evalf()
 		print("%s = %s" % (k, v))
 
+	print("R709 inv. gamma")
+	subs = {gamma: sympy.Rational("100/45"), a: sympy.Rational("99/1000")}
+	for k, v in s.items():
+		print("%s = %s" % (k, v))
+	for k, v in s.items():
+		v = v.subs(subs)
+		print("%s = %s" % (k, v))
+	for k, v in s.items():
+		v = v.subs(subs)
+		v = v.evalf()
+		print("%s = %s" % (k, v))
+
 	linear_part = x*m
 	other_part = ((1+a)*(x**gamma))-a
 
@@ -327,6 +339,19 @@ def do_gamma():
 		v = v.subs(subs)
 		v = v.evalf()
 		print("%s = %s" % (k, v))
+
+	print("R709 gamma")
+	subs = {gamma: sympy.Rational("45/100"), a: sympy.Rational("99/1000")}
+	for k, v in s.items():
+		print("%s = %s" % (k, v))
+	for k, v in s.items():
+		v = v.subs(subs)
+		print("%s = %s" % (k, v))
+	for k, v in s.items():
+		v = v.subs(subs)
+		v = v.evalf()
+		print("%s = %s" % (k, v))
+
 if __name__ == "__main__":
 	import sys
 	import argparse
