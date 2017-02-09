@@ -213,27 +213,43 @@ sRGB is an RGB color space that uses the ITU-R BT.709 primaries,
 
 """
 
-def srgb_gamma(rgb):
+def srgb_gamma(rgb, standard=False):
 	"""
 	Convert from linear RGB to sRGB
 	"""
 	srgb = np.zeros_like(rgb)
-	t0 = 0.0031308
-	alpha = 0.055
-	srgb[rgb<=t0] = 12.92 * rgb[rgb<=t0]
-	srgb[rgb>t0] = (1+alpha)*(rgb[rgb>t0]**(1/2.4)) - alpha
+	a = 0.055
+
+	if standard:
+		t0 = 0.0031308
+		m = 12.92
+	else:
+		# computed
+		m = 12.9232101807879
+		t0 = 0.00303993463977843
+
+	srgb[rgb<=t0] = m * rgb[rgb<=t0]
+	srgb[rgb>t0] = (1+a)*(rgb[rgb>t0]**(1/2.4)) - a
 	return srgb
 
 
-def srgb_invgamma(srgb):
+def srgb_invgamma(srgb, standard=False):
 	"""
 	Convert from sRGB to linear RGB
 	"""
 	rgb = np.zeros_like(srgb)
-	t0 = 0.04045
-	alpha = 0.055
-	rgb[srgb<=t0] = 1/12.92 * srgb[srgb<=t0]
-	rgb[srgb>t0] = ((srgb[srgb>t0]+alpha)/(1+alpha))**2.4
+	a = 0.055
+
+	if standard:
+		m = 12.92
+		t0 = 0.04045
+	else:
+		# computed
+		m = 0.0773801544670873
+		t0 = 0.0392857142857143
+
+	rgb[srgb<=t0] = m * srgb[srgb<=t0]
+	rgb[srgb>t0] = ((srgb[srgb>t0]+a)/(1+a))**2.4
 	return rgb
 
 
