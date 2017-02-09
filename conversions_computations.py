@@ -257,6 +257,13 @@ def do_lab():
 
 def do_gamma():
 	"""
+
+	Gamma correction use a transfer function which is an approximate
+	of a power function (:math:`x_g = x_l^\gamma`), and has many qualities:
+
+	- Noise reliability (not exactly applicable today)
+	- Perceptual optimization (banding in linear encoding)
+
 	Ref:
 
 	- https://en.wikipedia.org/wiki/SRGB#Theory_of_the_transformation
@@ -269,11 +276,20 @@ def do_gamma():
 	gamma = sympy.Symbol("gamma") # Exponent
 
 	"""
-	Gamma function
+	Gamma function approximation
 	"""
 
 	linear_part = x*m
 	other_part = ((1+a)*(x**gamma))-a
+
+
+	"""
+	TODO explain how this approximation is cool (compared to other
+	piecewise approximation possibilities)
+
+	TODO explain how the "infinite slope at x=0" is causing problems,
+	and explain how the noise is minimized when operating in gamma encoding.
+	"""
 
 	print("equality in value at junction")
 	e1 = sympy.Eq(other_part, linear_part)
