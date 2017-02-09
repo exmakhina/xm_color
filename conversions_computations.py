@@ -253,6 +253,80 @@ def do_lab():
 	s = x[0]
 	print(s)
 
+
+
+def do_gamma():
+	"""
+	Ref:
+
+	- https://en.wikipedia.org/wiki/SRGB#Theory_of_the_transformation
+
+	"""
+
+	"""
+	Inverse gamma function
+	"""
+
+	x, m, a, gamma \
+	 = sympy.symbols("x, m, a, gamma")
+
+	linear_part = x*m
+	other_part = ((x+a)/(1+a))**gamma
+
+	print("equality in value at junction")
+	e1 = sympy.Eq(other_part, linear_part)
+	print(sympy.pretty(e1))
+
+	print("equality in slope at junction")
+	e2 = sympy.Eq(sympy.diff(e1.lhs, x), sympy.diff(e1.rhs, x))
+	print(sympy.pretty(e2))
+
+	res = sympy.solve([e1, e2], exclude=[a,gamma])
+	print(res)
+	assert len(res) == 1
+	s = res[0]
+	print(s)
+
+	print("sRGB inv. gamma")
+	subs = {gamma: sympy.Rational("24/10"), a: sympy.Rational("55/1000")}
+	for k, v in s.items():
+		print("%s = %s" % (k, v))
+	for k, v in s.items():
+		v = v.subs(subs)
+		print("%s = %s" % (k, v))
+	for k, v in s.items():
+		v = v.subs(subs)
+		v = v.evalf()
+		print("%s = %s" % (k, v))
+
+	linear_part = x*m
+	other_part = ((1+a)*(x**gamma))-a
+
+	print("equality in value at junction")
+	e1 = sympy.Eq(other_part, linear_part)
+	print(sympy.pretty(e1))
+
+	print("equality in slope at junction")
+	e2 = sympy.Eq(sympy.diff(e1.lhs, x), sympy.diff(e1.rhs, x))
+	print(sympy.pretty(e2))
+
+	x = sympy.solve([e1, e2], exclude=[a,gamma])
+	print(x)
+	assert len(x) == 1
+	s = x[0]
+	print(s)
+
+	print("sRGB gamma")
+	subs = {gamma: sympy.Rational("10/24"), a: sympy.Rational("55/1000")}
+	for k, v in s.items():
+		print("%s = %s" % (k, v))
+	for k, v in s.items():
+		v = v.subs(subs)
+		print("%s = %s" % (k, v))
+	for k, v in s.items():
+		v = v.subs(subs)
+		v = v.evalf()
+		print("%s = %s" % (k, v))
 if __name__ == "__main__":
 	do_yuv()
 	do_ycbcr()
