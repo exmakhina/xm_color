@@ -328,8 +328,36 @@ def do_gamma():
 		v = v.evalf()
 		print("%s = %s" % (k, v))
 if __name__ == "__main__":
-	do_yuv()
-	do_ycbcr()
-	do_lab()
+	import sys
+	import argparse
 
+	parser = argparse.ArgumentParser(
+	 description="Conversion tests",
+	)
 
+	subparsers = parser.add_subparsers(
+	 help='the command; type "%s COMMAND -h" for command-specific help' % sys.argv[0],
+	 dest='command',
+	)
+
+	for k, v in locals().items():
+		if k.startswith("do_"):
+			subp = subparsers.add_parser(
+			 k,
+			 help="",
+			)
+
+	try:
+		import argcomplete
+		argcomplete.autocomplete(parser)
+	except:
+		pass
+
+	args = parser.parse_args()
+
+	if 0:
+		pass
+
+	for k, v in locals().items():
+		if args.command == k:
+			v()
