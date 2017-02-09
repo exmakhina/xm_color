@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 vi:noet
 
+import numpy as np
 import sympy
+import cv2
 
+from xm_color import conversions
 
 def do_yuv():
 	"""
