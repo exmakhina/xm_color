@@ -74,29 +74,45 @@ def ycbcr_bt709_fs_to_rgb(yuv):
 
 
 
-def r709_gamma(rgb):
+def r709_gamma(rgb, standard=False):
 	"""
 	Convert from linear RGB to R.709 gamma RGB
 	:param rgb: array with values in [0,1]
 	"""
 	srgb = np.zeros_like(rgb)
-	t0 = 0.0018
 	alpha = 0.099
-	srgb[rgb<=t0] = 4.5 * rgb[rgb<=t0]
-	srgb[rgb>t0] = (1+alpha)*(rgb[rgb>t0]**(0.45)) - alpha
+	gamma = 0.45
+	if standard:
+		m = 4.5
+		t0 = 0.0018
+	else:
+		# Computed
+		m = 4.51378626511534
+		t0 = 0.0179450233667478
+
+	srgb[rgb<=t0] = m * rgb[rgb<=t0]
+	srgb[rgb>t0] = (1+alpha)*(rgb[rgb>t0]**(gamma)) - alpha
 	return srgb
 
 
-def r709_invgamma(srgb):
+def r709_invgamma(srgb, standard=False):
 	"""
 	Convert from R.709 gamma RGB to linear RGB
 	:param srgb: array with values in [0,1]
 	"""
 	rgb = np.zeros_like(srgb)
-	t0 = 0.081
-	alpha = 0.055
-	rgb[srgb<=t0] = 1/4.5 * srgb[srgb<=t0]
-	rgb[srgb>t0] = ((srgb[srgb>t0]+alpha)/(1+alpha))**(1/0.45)
+	alpha = 0.099
+	gamma = 1/0.45
+	if standard:
+		m = 1/4.5
+		t0 = 0.081
+	else:
+		# Computed
+		m = 0.221543498354911
+		t0 = 0.0810000000000000
+
+	rgb[srgb<=t0] = m * srgb[srgb<=t0]
+	rgb[srgb>t0] = ((srgb[srgb>t0]+alpha)/(1+alpha))**(gamma)
 	return rgb
 
 
