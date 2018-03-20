@@ -28,16 +28,19 @@ def guess_2dbuffer_dimensions(buf, sx=1, sy=1):
 	res = []
 	for w, h in candidates:
 		def check_candidate():
-			img = buf.reshape((h, w))
+			img = np.float64(buf.reshape((h, w)))
 			tv = 0
 			for ix in range(1, 1+sx):
 				for iy in range(1, 1+sy):
 					try:
-						g = np.gradient(img[iy::sy,ix::sx])
+						gx, gy = np.gradient(img[iy::sy,ix::sx])
+						lxx, lxy = np.gradient(gx)
+						lyx, lyy = np.gradient(gy)
 					except ValueError:
 						#print("Not possible: %s" % (str((h, w, iy,sy,ix,sx))))
 						return
-					tv += np.sum(g)
+					tv += np.mean((gx**2+gy**2)**0.5)
+					tv += np.mean((lxx**2+lxy**2+lyx**2+lyy**2)**0.5)
 			res.append((tv, w, h))
 		check_candidate()
 
@@ -87,28 +90,81 @@ def guess_image_dimensions(buf):
 
 if __name__ == '__main__':
 
+	import argparse
 	import cv2
 
-	img = cv2.imread("2016-06-03.jpg")#[...,0]
-	buf = img.flatten()
 
-	if 0:
-		with open("pouet.raw", "rb") as f:
+	parser = argparse.ArgumentParser(
+	 description="image dimension guesser",
+	)
+
+	subparsers = parser.add_subparsers(
+	 help='the command; type "%s COMMAND -h" for command-specific help' % sys.argv[0],
+	 dest='command',
+	)
+
+	parser_log = subparsers.add_parser(
+	 "raw",
+	 help="guess raw buffer dimensions",
+	)
+
+	parser_log.add_argument("path",
+	 help="file to process",
+	)
+
+	parser_log.add_argument("--dtype",
+	 type=np.dtype,
+	 default=np.uint8,
+	)
+
+	parser_log.add_argument("--out",
+	)
+
+	try:
+		import argcomplete
+		argcomplete.autocomplete(parser)
+	except:
+		pass
+
+	args = parser.parse_args()
+
+	if args.command == "raw":
+
+		with open(args.path, "rb") as f:
 			data = f.read()
 
-		buf = np.fromstring(data, dtype=np.uint8)
+		buf = np.fromstring(data, dtype=args.dtype)
 
-	img, candidates = guess_2dbuffer_dimensions(buf)#, sx=3)
+		img, candidates = guess_2dbuffer_dimensions(buf)
 
-	for tv, w, h in candidates:
-		print("%f %dx%d" % (tv, w, h))
+		for tv, w, h in candidates:
+			print("%f %dx%d" % (tv, w, h))
 
-	cv2.imwrite("gen/tmp-guess-0-2dbuf.jpg", img)
+		if args.out:
+			img = np.uint8(cv2.normalize(np.float32(img), dst=None, norm_type=cv2.NORM_MINMAX, alpha=0, beta=255))
+			cv2.imwrite(args.out, img)
 
-	img, candidates = guess_image_dimensions(buf)
-	#print(img.shape)
+	if 0:
+		img = cv2.imread("2016-06-03.jpg")#[...,0]
+		buf = img.flatten()
 
-	for tv, sx, sy, w, h in candidates:
-		print("%f %d/%d %dx%d" % (tv, sx, sy, w, h))
+		if 0:
+			with open("pouet.raw", "rb") as f:
+				data = f.read()
 
-	cv2.imwrite("gen/tmp-guess-1-img.jpg", img)
+			buf = np.fromstring(data, dtype=np.uint8)
+
+		img, candidates = guess_2dbuffer_dimensions(buf)#, sx=3)
+
+		for tv, w, h in candidates:
+			print("%f %dx%d" % (tv, w, h))
+
+		cv2.imwrite("gen/tmp-guess-0-2dbuf.jpg", img)
+
+		img, candidates = guess_image_dimensions(buf)
+		#print(img.shape)
+
+		for tv, sx, sy, w, h in candidates:
+			print("%f %d/%d %dx%d" % (tv, sx, sy, w, h))
+
+		cv2.imwrite("gen/tmp-guess-1-img.jpg", img)
