@@ -5,6 +5,14 @@
 import sys, io
 
 import numpy as np
+def total_variation(img):
+	"""
+	"""
+
+	if 1:
+		gy = np.diff(img, axis=0)
+		tv = np.mean((gy**2)**0.5)
+		return tv
 
 def guess_2dbuffer_dimensions(buf, sx=1, sy=1):
 	"""
@@ -32,15 +40,11 @@ def guess_2dbuffer_dimensions(buf, sx=1, sy=1):
 			tv = 0
 			for ix in range(1, 1+sx):
 				for iy in range(1, 1+sy):
-					try:
-						gx, gy = np.gradient(img[iy::sy,ix::sx])
-						lxx, lxy = np.gradient(gx)
-						lyx, lyy = np.gradient(gy)
-					except ValueError:
-						#print("Not possible: %s" % (str((h, w, iy,sy,ix,sx))))
-						return
-					tv += np.mean((gx**2+gy**2)**0.5)
-					tv += np.mean((lxx**2+lxy**2+lyx**2+lyy**2)**0.5)
+
+					reint = img[iy::sy,ix::sx]
+
+					tv += total_variation(img)
+
 			res.append((tv, w, h))
 		check_candidate()
 
