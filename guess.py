@@ -26,11 +26,17 @@ def guess_2dbuffer_dimensions(buf, sx=1, sy=1):
 	:return: reshaped buffer or None, and list of candidate values in increasing order
 	"""
 
+	max_ar = 10.0
+
 	candidates = []
 	l = len(buf)
 	for n in range(1, l):
 		q, r = divmod(l, n)
 		if r == 0 and (n % sx) == 0 and (q % sy) == 0 and q >= sy and n >= sx:
+
+			if n > max_ar * q or q > max_ar * n:
+				continue
+
 			candidates.append((n,q))
 
 	res = []
