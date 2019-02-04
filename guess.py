@@ -130,6 +130,18 @@ if __name__ == '__main__':
 	parser_log.add_argument("--out",
 	)
 
+	parser_log = subparsers.add_parser(
+	 "image",
+	 help="guess raw buffer dimensions",
+	)
+
+	parser_log.add_argument("path",
+	 help="file to process",
+	)
+
+	parser_log.add_argument("--out",
+	)
+
 	try:
 		import argcomplete
 		argcomplete.autocomplete(parser)
@@ -144,6 +156,21 @@ if __name__ == '__main__':
 			data = f.read()
 
 		buf = np.fromstring(data, dtype=args.dtype)
+
+		img, candidates = guess_2dbuffer_dimensions(buf)
+
+
+		if args.out:
+			import cv2
+			cv2.imwrite(args.out, img)
+
+	if args.command == "image":
+		import cv2
+
+		buf = cv2.imread(args.path)
+		if len(buf.shape) > 2:
+			buf = cv2.cvtColor(buf, cv2.COLOR_RGB2GRAY)
+		buf = buf.reshape((-1,))
 
 		img, candidates = guess_2dbuffer_dimensions(buf)
 
